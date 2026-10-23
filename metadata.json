@@ -1,0 +1,6 @@
+{
+  "name": "Infinite Calendar",
+  "description": "An elegant, highly responsive Android calendar with a vertical infinite-scrolling month view, smooth snapping, and integrated local event persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

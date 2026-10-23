@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:gravity="center_horizontal"
+    android:padding="0dp">
+
+    <!-- Top Accent Header Bar -->
+    <LinearLayout
+        android:id="@+id/widget_header"
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:background="@drawable/widget_header_bg"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_header_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MAY"
+            android:textColor="#FFFFFF"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
+    </LinearLayout>
+
+    <!-- Main Dynamic Body Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="4dp">
+
+        <!-- Short Weekday (e.g. TUE) -->
+        <TextView
+            android:id="@+id/widget_day_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TUE"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05" />
+
+        <!-- Bold Day Number (e.g. 26) -->
+        <TextView
+            android:id="@+id/widget_date_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="26"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:includeFontPadding="false"
+            android:layout_marginTop="-2dp"
+            android:layout_marginBottom="-2dp" />
+
+        <!-- Glowing activity indicator dots -->
+        <LinearLayout
+            android:id="@+id/widget_dots_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="1dp">
+
+            <ImageView
+                android:id="@+id/widget_event_dot"
+                android:layout_width="5.5dp"
+                android:layout_height="5.5dp"
+                android:layout_marginHorizontal="1dp"
+                android:src="@drawable/widget_dot_bg"
+                android:visibility="gone"
+                android:contentDescription="Event indicator dot 1" />
+
+            <ImageView
+                android:id="@+id/widget_event_dot_2"
+                android:layout_width="5.5dp"
+                android:layout_height="5.5dp"
+                android:layout_marginHorizontal="1dp"
+                android:src="@drawable/widget_dot_bg"
+                android:visibility="gone"
+                android:contentDescription="Event indicator dot 2" />
+
+            <ImageView
+                android:id="@+id/widget_event_dot_3"
+                android:layout_width="5.5dp"
+                android:layout_height="5.5dp"
+                android:layout_marginHorizontal="1dp"
+                android:src="@drawable/widget_dot_bg"
+                android:visibility="gone"
+                android:contentDescription="Event indicator dot 3" />
+
+            <ImageView
+                android:id="@+id/widget_event_dot_4"
+                android:layout_width="5.5dp"
+                android:layout_height="5.5dp"
+                android:layout_marginHorizontal="1dp"
+                android:src="@drawable/widget_dot_bg"
+                android:visibility="gone"
+                android:contentDescription="Event indicator dot 4" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
