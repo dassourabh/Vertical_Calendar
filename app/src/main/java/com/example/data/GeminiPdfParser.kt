@@ -1,20 +1,17 @@
 package com.example.data
 
-import com.example.BuildConfig
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
 object GeminiPdfParser {
 
-    suspend fun parseHolidayPdf(pdfBase64: String): List<ParsedHoliday> {
-        val apiKey = BuildConfig.GEMINI_API_KEY
+    suspend fun parseHolidayPdf(pdfBase64: String, userApiKey: String): List<ParsedHoliday> {
+        val apiKey = userApiKey.trim()
         if (apiKey.isEmpty()) {
-            throw IllegalStateException("Gemini API Key is missing. Please configure it in your secrets.")
+            throw IllegalStateException("Gemini API Key is missing. Please enter your Gemini API Key in the Organization Holidays settings.")
         }
 
         val requestJson = JSONObject().apply {

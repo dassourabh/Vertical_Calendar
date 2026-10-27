@@ -116,6 +116,26 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         _showOrgHolidays.value = show
     }
 
+    // User-provided Gemini API Key stored privately on device (no build-time hardcoded key)
+    private val _userGeminiApiKey = MutableStateFlow(sharedPrefs.getString("user_gemini_api_key", "") ?: "")
+    val userGeminiApiKey: StateFlow<String> = _userGeminiApiKey.asStateFlow()
+
+    fun setUserGeminiApiKey(apiKey: String) {
+        val trimmed = apiKey.trim()
+        sharedPrefs.edit().putString("user_gemini_api_key", trimmed).apply()
+        _userGeminiApiKey.value = trimmed
+        _pdfParsingError.value = null
+    }
+
+    fun clearUserGeminiApiKey() {
+        sharedPrefs.edit().remove("user_gemini_api_key").apply()
+        _userGeminiApiKey.value = ""
+    }
+
+    fun setPdfParsingError(message: String?) {
+        _pdfParsingError.value = message
+    }
+
     // PDF upload and extraction states
     private val _isPdfParsing = MutableStateFlow(false)
     val isPdfParsing: StateFlow<Boolean> = _isPdfParsing.asStateFlow()
@@ -128,6 +148,11 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
             _isPdfParsing.value = true
             _pdfParsingError.value = null
             try {
+                val activeKey = _userGeminiApiKey.value.trim()
+                if (activeKey.isEmpty()) {
+                    throw IllegalStateException("Please enter your Gemini API Key before uploading a holiday PDF.")
+                }
+
                 val base64 = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                     context.contentResolver.openInputStream(pdfUri)?.use { inputStream ->
                         val bytes = inputStream.readBytes()
@@ -135,7 +160,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
                     } ?: throw IllegalArgumentException("Could not open file stream")
                 }
 
-                val parsed = GeminiPdfParser.parseHolidayPdf(base64)
+                val parsed = GeminiPdfParser.parseHolidayPdf(base64, activeKey)
                 
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                     repository.clearAllOrgHolidays()

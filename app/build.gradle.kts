@@ -98,6 +98,7 @@ android {
 secrets {
   propertiesFileName = ".env"
   defaultPropertiesFileName = ".env.example"
+  ignoreList.add("GEMINI_API_KEY")
 }
 
 // Some unused dependencies are commented out below instead of being removed.

@@ -27,7 +27,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -629,6 +633,7 @@ fun InfiniteCalendarScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                         .padding(24.dp)
                 ) {
                     // Header Row with Title and Refresh Sync Button
@@ -807,13 +812,164 @@ fun InfiniteCalendarScreen(
                     val isPdfParsing by viewModel.isPdfParsing.collectAsStateWithLifecycle()
                     val pdfParsingError by viewModel.pdfParsingError.collectAsStateWithLifecycle()
                     val orgHolidaysList by viewModel.orgHolidays.collectAsStateWithLifecycle()
+                    val savedApiKey by viewModel.userGeminiApiKey.collectAsStateWithLifecycle()
+                    var apiKeyDraft by remember(savedApiKey) { mutableStateOf(savedApiKey) }
+                    var isEditingApiKey by remember { mutableStateOf(savedApiKey.isEmpty()) }
+                    var showRawApiKey by remember { mutableStateOf(false) }
 
                     Text(
-                        text = "Upload a PDF with your organization's list of holidays. The Gemini AI engine will parse the document and map the holidays onto your calendar.",
+                        text = "Upload a PDF with your organization's list of holidays. Enter your personal Gemini API key below (saved privately on your device) to parse and map holidays onto your calendar.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
+
+                    // In-App User Gemini API Key Configuration
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Gemini API Key",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = if (savedApiKey.isNotEmpty()) "Saved on device" else "Not configured",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (savedApiKey.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            if (savedApiKey.isNotEmpty() && !isEditingApiKey) {
+                                val maskedTail = if (savedApiKey.length > 4) savedApiKey.takeLast(4) else "••••"
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "••••••••••••$maskedTail",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        TextButton(
+                                            onClick = {
+                                                apiKeyDraft = savedApiKey
+                                                isEditingApiKey = true
+                                            },
+                                            modifier = Modifier.testTag("edit_gemini_api_key_button"),
+                                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Edit API Key",
+                                                modifier = Modifier.size(14.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("Change", fontSize = 12.sp)
+                                        }
+                                        TextButton(
+                                            onClick = {
+                                                viewModel.clearUserGeminiApiKey()
+                                                apiKeyDraft = ""
+                                                isEditingApiKey = true
+                                            },
+                                            modifier = Modifier.testTag("clear_gemini_api_key_button"),
+                                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Remove API Key",
+                                                modifier = Modifier.size(14.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("Remove", fontSize = 12.sp)
+                                        }
+                                    }
+                                }
+                            } else {
+                                OutlinedTextField(
+                                    value = apiKeyDraft,
+                                    onValueChange = { apiKeyDraft = it },
+                                    placeholder = { Text("Paste Gemini API key (AIza...)", fontSize = 12.sp) },
+                                    singleLine = true,
+                                    visualTransformation = if (showRawApiKey) VisualTransformation.None else PasswordVisualTransformation(),
+                                    trailingIcon = {
+                                        TextButton(
+                                            onClick = { showRawApiKey = !showRawApiKey },
+                                            contentPadding = PaddingValues(horizontal = 6.dp)
+                                        ) {
+                                            Text(
+                                                text = if (showRawApiKey) "Hide" else "Show",
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    },
+                                    textStyle = MaterialTheme.typography.bodySmall,
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag("gemini_api_key_input")
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    if (savedApiKey.isNotEmpty()) {
+                                        TextButton(
+                                            onClick = {
+                                                apiKeyDraft = savedApiKey
+                                                isEditingApiKey = false
+                                            },
+                                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                                        ) {
+                                            Text("Cancel", fontSize = 12.sp)
+                                        }
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                    }
+                                    Button(
+                                        onClick = {
+                                            viewModel.setUserGeminiApiKey(apiKeyDraft)
+                                            isEditingApiKey = false
+                                        },
+                                        enabled = apiKeyDraft.trim().isNotEmpty(),
+                                        shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                        modifier = Modifier.testTag("save_gemini_api_key_button")
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Save API Key",
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Save Key", fontSize = 12.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     Row(
                         modifier = Modifier
@@ -879,7 +1035,19 @@ fun InfiniteCalendarScreen(
                         ) {
                             Button(
                                 onClick = {
-                                    pdfPickerLauncher.launch("application/pdf")
+                                    val candidateKey = if (isEditingApiKey && apiKeyDraft.trim().isNotEmpty()) {
+                                        viewModel.setUserGeminiApiKey(apiKeyDraft.trim())
+                                        isEditingApiKey = false
+                                        apiKeyDraft.trim()
+                                    } else {
+                                        savedApiKey.trim()
+                                    }
+                                    if (candidateKey.isEmpty()) {
+                                        isEditingApiKey = true
+                                        viewModel.setPdfParsingError("Please enter your Gemini API Key above before uploading a PDF.")
+                                    } else {
+                                        pdfPickerLauncher.launch("application/pdf")
+                                    }
                                 },
                                 modifier = Modifier.weight(1f).testTag("upload_pdf_holidays_button"),
                                 shape = RoundedCornerShape(10.dp),
