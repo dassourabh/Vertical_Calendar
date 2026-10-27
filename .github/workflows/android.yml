@@ -20,7 +20,7 @@ jobs:
     - name: Build Release APK
       run: ./gradlew assembleRelease
     - name: Releasing using Hub
-      uses: dassourabh/release-apk@main
+      uses: sangatdesai/release-apk@main
       env:
        GITHUB_TOKEN: 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
        APP_FOLDER: app
