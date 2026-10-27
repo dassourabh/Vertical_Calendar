@@ -16,3 +16,7 @@
 local.properties
 .env
 debug.keystore
+.github/workflows/android.yml
+LICENSE
+PRIVACY_POLICY.md
+README.md
