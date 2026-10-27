@@ -108,9 +108,14 @@ Any revised version will be published in the project's GitHub repository, togeth
 
 ## 10. Contact
 
-For questions or concerns regarding this Privacy Policy, please contact the developer through the project's GitHub repository:
+For questions or concerns regarding this Privacy Policy, please contact the developer through the mentioned contact information:
+E-Mail: dassourabh001@gmail.com
+Phone: (+91) 8777694423
+
+Alternatively, please contact the developer through the project's GitHub repository:
 
 https://github.com/dassourabh/Vertical_Calendar
+
 
 ---
 
