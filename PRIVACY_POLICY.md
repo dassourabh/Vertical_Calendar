@@ -108,9 +108,12 @@ Any revised version will be published in the project's GitHub repository, togeth
 
 ## 10. Contact
 
-For questions or concerns regarding this Privacy Policy, please contact the developer through the mentioned contact information:
+For questions or concerns regarding this Privacy Policy, please contact the developer through the contact information mentioned below:
+
 E-Mail: dassourabh001@gmail.com
+
 Phone: (+91) 8777694423
+
 
 Alternatively, please contact the developer through the project's GitHub repository:
 
